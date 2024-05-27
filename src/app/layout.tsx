@@ -5,6 +5,7 @@ import NavBar from "@/components/NavBar";
 import { ClerkProvider } from "@clerk/nextjs";
 import { constructMetadata } from "@/lib/utils";
 import Footer from "@/components/Footer";
+import { Toaster } from "@/components/ui/sonner";
 
 const recursive = Recursive({ subsets: ["latin-ext"] });
 
@@ -24,6 +25,7 @@ export default function RootLayout({
             <div className="flex flex-1 flex-col h-full">{children}</div>
             <Footer />
           </main>
+          <Toaster />
         </body>
       </html>
     </ClerkProvider>
