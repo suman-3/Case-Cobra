@@ -3,13 +3,11 @@ import { Recursive } from "next/font/google";
 import "./globals.css";
 import NavBar from "@/components/NavBar";
 import { ClerkProvider } from "@clerk/nextjs";
+import { constructMetadata } from "@/lib/utils";
 
 const recursive = Recursive({ subsets: ["latin-ext"] });
 
-export const metadata: Metadata = {
-  title: "Case Cobra",
-  description: "Create custom high-quality phone cases in seconds",
-};
+export const metadata = constructMetadata()
 
 export default function RootLayout({
   children,
