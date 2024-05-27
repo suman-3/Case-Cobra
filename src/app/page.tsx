@@ -1,6 +1,7 @@
 import { Icons } from "@/components/Icons";
 import MaxWidthWrapper from "@/components/MaxWidthWrapper";
 import Phone from "@/components/Phone";
+import Reviews from "@/components/Reviews";
 import { Check, Star, StarHalf, StarIcon } from "lucide-react";
 import Image from "next/image";
 
@@ -124,7 +125,7 @@ export default function Home() {
               className="w-24 order-0 lg:order-2"
             />
           </div>
-          <div className="mx-auto max-w-2xl grid-cols-1 px-4 lg:mx-0 lg:max-w-none lg:grid-cols-2 gap-y-10">
+          <div className="mx-auto max-w-2xl grid grid-cols-1 px-4 lg:mx-0 lg:max-w-none lg:grid-cols-2 gap-y-10">
             <div className="flex flex-auto flex-col gap-4 lg:pr-8 xl:pr-20">
               <div className="flex gap-0.5 mb-1">
                 <Star className="h-5 w-5 text-green-600 fill-green-600" />
@@ -159,7 +160,7 @@ export default function Home() {
                 </div>
               </div>
             </div>
-            <div className="flex flex-auto flex-col gap-4 lg:pr-8 xl:pr-20 mt-5">
+            <div className="flex flex-auto flex-col gap-4 lg:pr-8 xl:pr-20">
               <div className="flex gap-0.5 mb-1">
                 <Star className="h-5 w-5 text-green-600 fill-green-600" />
                 <Star className="h-5 w-5 text-green-600 fill-green-600" />
@@ -196,6 +197,10 @@ export default function Home() {
             </div>
           </div>
         </MaxWidthWrapper>
+
+        <div className="pt-15">
+          <Reviews />
+        </div>
       </section>
     </div>
   );
