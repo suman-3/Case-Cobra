@@ -4,6 +4,7 @@ import "./globals.css";
 import NavBar from "@/components/NavBar";
 import { ClerkProvider } from "@clerk/nextjs";
 import { constructMetadata } from "@/lib/utils";
+import Footer from "@/components/Footer";
 
 const recursive = Recursive({ subsets: ["latin-ext"] });
 
@@ -20,6 +21,7 @@ export default function RootLayout({
         <body className={recursive.className}>
           <NavBar />
           {children}
+          <Footer/>
         </body>
       </html>
     </ClerkProvider>
