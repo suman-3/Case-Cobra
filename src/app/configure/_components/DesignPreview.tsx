@@ -10,9 +10,19 @@ import { useMutation } from "@tanstack/react-query";
 import { ArrowRight, Check } from "lucide-react";
 import { useEffect, useState } from "react";
 import Confetti from "react-dom-confetti";
+import { createCheckoutSession } from "../preview/actions/actions";
+import { useKindeBrowserClient } from "@kinde-oss/kinde-auth-nextjs";
+
+import { toast } from "sonner";
+import LoginModal from "./LoginModal";
+import { useRouter } from "next/navigation";
 
 const DesignPreview = ({ configuration }: { configuration: Configuration }) => {
+  const router = useRouter();
+  const { id } = configuration;
+  const { user } = useKindeBrowserClient();
   const [isLoginModalOpen, setIsLoginModalOpen] = useState<boolean>(false);
+  const [loading, setLoading] = useState<boolean>(false);
 
   const [showConfetti, setShowConfetti] = useState<boolean>(false);
   useEffect(() => setShowConfetti(true));
@@ -32,13 +42,31 @@ const DesignPreview = ({ configuration }: { configuration: Configuration }) => {
     totalPrice += PRODUCT_PRICES.material.polycarbonate;
   if (finish === "textured") totalPrice += PRODUCT_PRICES.finish.textured;
 
-const {} =useMutation({
-  mutationKey:['get-checkout-session'],
-  // TODO: mutation function
-})
+  const { mutate: createPaymentSession } = useMutation({
+    mutationKey: ["get-checkout-session"],
+    mutationFn: createCheckoutSession,
+    onSuccess: ({ url }) => {
+      if (url) {
+        router.push(url);
+        setLoading(false);
+      } else throw new Error("Unable to retrieve payment URL.");
+    },
+    onError: () => {
+      toast("Something went wrong");
+    },
+  });
 
-
-
+  const handleCheckout = () => {
+    setLoading(true);
+    if (user) {
+      // create payment session
+      createPaymentSession({ configId: id });
+    } else {
+      // need to log in
+      localStorage.setItem("configurationId", id);
+      setIsLoginModalOpen(true);
+    }
+  };
 
   return (
     <>
@@ -48,14 +76,11 @@ const {} =useMutation({
       >
         <Confetti
           active={showConfetti}
-          config={{
-            elementCount: 700,
-            spread: 130,
-            startVelocity: 40,
-            colors: ["#FFD700", "#FF0000", "#00FF00", "#0000FF"],
-          }}
+          config={{ elementCount: 200, spread: 90 }}
         />
       </div>
+
+      <LoginModal isOpen={isLoginModalOpen} setIsOpen={setIsLoginModalOpen} />
 
       <div className="mt-20 flex flex-col items-center md:grid text-sm sm:grid-cols-12 sm:grid-rows-1 sm:gap-x-6 md:gap-x-8 lg:gap-x-12">
         <div className="md:col-span-4 lg:col-span-3 md:row-span-2 md:row-end-2">
@@ -72,10 +97,6 @@ const {} =useMutation({
           <div className="mt-3 flex items-center gap-1.5 text-base">
             <Check className="h-4 w-4 text-green-500" />
             In stock and ready to ship
-          </div>
-          <div className="mt-3 flex items-center gap-1.5 text-base">
-            <span className={cn(`bg-${tw} h-4 w-4 rounded-full mr-0.5`)}></span>
-            Case Color: {color}
           </div>
         </div>
 
@@ -139,7 +160,12 @@ const {} =useMutation({
             </div>
 
             <div className="mt-8 flex justify-end pb-12">
-              <Button className="px-4 sm:px-6 lg:px-8">
+              <Button
+                onClick={() => handleCheckout()}
+                className="px-4 sm:px-6 lg:px-8"
+                isLoading={loading}
+                loadingText="Processing"
+              >
                 Check out <ArrowRight className="h-4 w-4 ml-1.5 inline" />
               </Button>
             </div>
