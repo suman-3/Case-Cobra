@@ -26,7 +26,7 @@ import { BASE_PRICE } from "@/config/products";
 import { toast } from "sonner";
 import { useUploadThing } from "@/lib/uploadthing";
 import { useMutation } from "@tanstack/react-query";
-import { SaveConfigArgs, saveConfig as _saveConfig } from "../actions/actions";
+import { SaveConfigArgs, saveConfig as _saveConfig } from "../design/actions/actions";
 import { useRouter } from "next/navigation";
 
 interface DesignConfiguratorProps {
@@ -57,6 +57,7 @@ const DesignConfigurator = ({
       setLoading(false);
       toast("Configuration saved");
       router.push(`/configure/preview?id=${configId}`);
+      router.refresh();
     },
   });
 
@@ -393,11 +394,11 @@ const DesignConfigurator = ({
                 }}
                 size="sm"
                 className="w-full flex items-center gap-1"
+                isLoading={loading}
+                disabled={loading}
+                loadingText="Saving"
               >
-                {loading ? (
-                  <Loader2 className="h-4 w-4 mr-1.5 animate-spin inline" />
-                ) : null}
-                {loading ? "Saving..." : "Continue ✨"}
+                Continue ✨
                 <ArrowRight className="h-4 w-4 ml-1.5 inline" />
               </Button>
             </div>
