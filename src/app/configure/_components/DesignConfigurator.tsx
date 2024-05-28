@@ -1,6 +1,6 @@
 "use client";
 import { AspectRatio } from "@/components/ui/aspect-ratio";
-import React, { useState } from "react";
+import React, { useRef, useState } from "react";
 import NextImage from "next/image";
 import { cn, formatPrice } from "@/lib/utils";
 import { Rnd } from "react-rnd";
@@ -50,15 +50,52 @@ const DesignConfigurator = ({
     finish: FINISHES.options[0],
   });
 
+  const [renderedDimensions, setRenderedDimensions] = useState({
+    width: imageDimensions.width / 4,
+    height: imageDimensions.height / 4,
+  });
+
+  const [renderedPosition, setRenderedPosition] = useState({
+    x: 150,
+    y: 205,
+  });
+
+  const phoneCaseRef = useRef<HTMLDivElement>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  async function saveConfiguration() {
+    try {
+      const {
+        left: caseLeft,
+        top: caseTop,
+        width,
+        height,
+      } = phoneCaseRef.current!.getBoundingClientRect();
+
+      const { left: containerLeft, top: containerTop } =
+        containerRef.current!.getBoundingClientRect();
+
+      const leftOffset = caseLeft - containerLeft;
+      const topOffset = caseTop - containerTop;
+
+      const actualX = renderedPosition.x - leftOffset;
+      const actualY = renderedPosition.y - topOffset;
+      
+
+    } catch (error: any) {
+      console.log(error.message);
+    }
+  }
+
   return (
     <div className="relative mt-20 grid grid-cols-1 lg:grid-cols-3 mb-20 pb-20">
       <div
-        // ref={containerRef}
+        ref={containerRef}
         className="relative h-[37.5rem] overflow-hidden col-span-2 w-full max-w-4xl flex items-center justify-center rounded-lg border-2 border-dashed border-gray-300 p-12 text-center focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2"
       >
         <div className="relative w-60 bg-opacity-50 pointer-events-none aspect-[896/1831]">
           <AspectRatio
-            // ref={phoneCaseRef}
+            ref={phoneCaseRef}
             ratio={896 / 1831}
             className="pointer-events-none relative z-50 aspect-[896/1831] w-full"
           >
@@ -84,6 +121,21 @@ const DesignConfigurator = ({
             y: 205,
             height: imageDimensions.height / 4,
             width: imageDimensions.width / 4,
+          }}
+          onResizeStop={(_, __, ref, ___, { x, y }) => {
+            setRenderedDimensions({
+              height: parseInt(ref.style.height.slice(0, -2)),
+              width: parseInt(ref.style.width.slice(0, -2)),
+            });
+
+            setRenderedPosition({
+              x,
+              y,
+            });
+          }}
+          onDragStop={(_, data) => {
+            const { x, y } = data;
+            setRenderedPosition({ x, y });
           }}
           className="absolute z-20 border-primary border-[3px]"
           lockAspectRatio
