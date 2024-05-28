@@ -70,10 +70,9 @@ export async function POST(req: Request) {
           },
         },
       });
-
-      await resend.emails.send({
         // from: 'CaseCobra <hello@joshtriedcoding.com>',
         // to: [event.data.object.customer_details.email],
+      await resend.emails.send({
         from: "casecobra@resend.dev",
         to: "mondalsuman97322@gmail.com",
         subject: "Thanks for your order!",
