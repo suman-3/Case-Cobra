@@ -21,10 +21,13 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
-import { ArrowRight, Check, ChevronsUpDown } from "lucide-react";
+import { ArrowRight, Check, ChevronsUpDown, Loader2 } from "lucide-react";
 import { BASE_PRICE } from "@/config/products";
 import { toast } from "sonner";
 import { useUploadThing } from "@/lib/uploadthing";
+import { useMutation } from "@tanstack/react-query";
+import { SaveConfigArgs, saveConfig as _saveConfig } from "../actions/actions";
+import { useRouter } from "next/navigation";
 
 interface DesignConfiguratorProps {
   imageUrl: string;
@@ -40,6 +43,23 @@ const DesignConfigurator = ({
   configId,
   imageDimensions,
 }: DesignConfiguratorProps) => {
+  const [loading, setLoading] = useState(false);
+  const router = useRouter();
+  const { mutate: saveConfig } = useMutation({
+    mutationKey: ["save-config"],
+    mutationFn: async (args: SaveConfigArgs) => {
+      await Promise.all([saveConfiguration(), _saveConfig(args)]);
+    },
+    onError: (error) => {
+      toast("Something went wrong");
+    },
+    onSuccess: () => {
+      setLoading(false);
+      toast("Configuration saved");
+      router.push(`/configure/preview?id=${configId}`);
+    },
+  });
+
   const [options, setOptions] = useState<{
     color: (typeof COLORS)[number];
     model: (typeof MODELS.options)[number];
@@ -68,6 +88,7 @@ const DesignConfigurator = ({
   const { startUpload } = useUploadThing("imageUploader");
 
   async function saveConfiguration() {
+    setLoading(true);
     try {
       const {
         left: caseLeft,
@@ -362,12 +383,21 @@ const DesignConfigurator = ({
               </p>
               <Button
                 onClick={() => {
-                  saveConfiguration();
+                  saveConfig({
+                    configId,
+                    color: options.color.value,
+                    finish: options.finish.value,
+                    material: options.material.value,
+                    model: options.model.value,
+                  });
                 }}
                 size="sm"
-                className="w-full"
+                className="w-full flex items-center gap-1"
               >
-                Continue
+                {loading ? (
+                  <Loader2 className="h-4 w-4 mr-1.5 animate-spin inline" />
+                ) : null}
+                {loading ? "Saving..." : "Continue ✨"}
                 <ArrowRight className="h-4 w-4 ml-1.5 inline" />
               </Button>
             </div>
